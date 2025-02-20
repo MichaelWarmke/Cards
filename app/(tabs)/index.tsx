@@ -32,6 +32,7 @@ export default function HomeScreen() {
             })}
           </ThemedText>{' '}
           to open developer tools.
+            hello world. noob.
         </ThemedText>
       </ThemedView>
       <ThemedView style={styles.stepContainer}>
