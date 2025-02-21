@@ -78,3 +78,5 @@ const styles = StyleSheet.create({
         transform: [{rotate: '180deg'}],
     },
 });
+
+export default Card;
