@@ -2,8 +2,8 @@ import React from 'react';
 import {View, Text, StyleSheet} from 'react-native';
 
 export interface CardProps {
-    suit: 'hearts' | 'diamonds' | 'clubs' | 'spades';
-    rank: '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' | '10' | 'J' | 'Q' | 'K' | 'A';
+    suit: 'hearts' | 'diamonds' | 'clubs' | 'spades' | 'none';
+    rank: '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' | '10' | 'J' | 'Q' | 'K' | 'A' | 'STOP';
     isFaceDown?: boolean; // Optional prop to represent face down cards
 }
 
@@ -12,6 +12,7 @@ const suitSymbols = {
     diamonds: '♦',
     clubs: '♣',
     spades: '♠',
+    none: '0'
 };
 
 const suitColors = {
@@ -19,6 +20,7 @@ const suitColors = {
     diamonds: 'red',
     clubs: 'black',
     spades: 'black',
+    none: 'black'
 };
 
 export const Card: React.FC<CardProps> = ({suit, rank, isFaceDown = false}) => {

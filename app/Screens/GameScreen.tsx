@@ -1,23 +1,29 @@
-import React, { useState, useEffect } from 'react';
+import React, {useState, useEffect, useRef} from 'react';
 import { View, Text, Button, StyleSheet } from 'react-native';
 import Hand from '../../../mikescards/app/Components/Hand';
 
 // Define card types and deck generation function
-type Suit = 'hearts' | 'diamonds' | 'clubs' | 'spades';
-type Rank = '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' | '10' | 'J' | 'Q' | 'K' | 'A';
-type CardType = { suit: Suit; rank: Rank };
+type Suit = 'hearts' | 'diamonds' | 'clubs' | 'spades' | 'none';
+type Rank = '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' | '10' | 'J' | 'Q' | 'K' | 'A' | 'STOP'; // Include 'STOP' for stop card
+type CardType = { suit: Suit; rank: Rank }; // CardType can be regular card or stop card
 
-const ranks: Rank[] = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A'];
+const ranks: Exclude<Rank, 'STOP'>[] = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A'];
 const suits: Suit[] = ['hearts', 'diamonds', 'clubs', 'spades'];
 
-const generateDeck = (): CardType[] => {
-    const deck: CardType[] = [];
-    suits.forEach(suit => {
-        ranks.forEach(rank => {
-            deck.push({ suit, rank });
+const generateDeck = (deckCount: number, includeStopCard: boolean = true): CardType[] => {
+    console.log("Generating new Deck")
+    let deck: CardType[] = [];
+    for (let i = 0; i < 4; i++) { // 4 decks by default as per standard blackjack
+        suits.forEach(suit => {
+            ranks.forEach(rank => {
+                deck.push({ suit, rank });
+            });
         });
-    });
-    return deck;
+    }
+    if (includeStopCard) {
+        deck.push({ suit: 'none', rank: 'STOP' }); // Add stop card to the generated deck
+    }
+    return shuffleDeck(deck);
 };
 
 // Function to shuffle an array (Fisher-Yates shuffle algorithm)
@@ -42,10 +48,11 @@ const shuffleDeck = (deck: CardType[]): CardType[] => {
 const getHandValue = (hand: CardType[]): number => {
     let value = 0;
     let aces = 0;
-    hand.forEach(card => {
-        let cardValue = parseInt(card.rank);
+    for (const card of hand) {
+        if (card.rank === 'STOP') continue; // Stop card has no value
+        let cardValue = parseInt(card.rank as string); // Type assertion here
         if (isNaN(cardValue)) {
-            if (['J', 'Q', 'K'].includes(card.rank)) {
+            if (['J', 'Q', 'K'].includes(card.rank as string)) { // Type assertion here
                 cardValue = 10;
             } else if (card.rank === 'A') {
                 cardValue = 11;
@@ -53,7 +60,7 @@ const getHandValue = (hand: CardType[]): number => {
             }
         }
         value += cardValue;
-    });
+    }
     while (value > 21 && aces > 0) {
         value -= 10;
         aces -= 1;
@@ -63,30 +70,41 @@ const getHandValue = (hand: CardType[]): number => {
 
 const isBlackjack = (hand: CardType[]): boolean => {
     if (hand.length !== 2) return false;
-    const hasAce = hand.some(card => card.rank === 'A');
-    const hasTenValue = hand.some(card => ['10', 'J', 'Q', 'K'].includes(card.rank));
-    return hasAce && hasTenValue;
+    return hand.some(card => card.rank === 'A') && hand.some(card => ['10', 'J', 'Q', 'K'].includes(card.rank as string)); // Type assertion here
 }
 
-
-
 const GameScreen: React.FC = () => {
-    const [deck, setDeck] = useState<CardType[]>(generateDeck());
+    const [dealerDeckCount, setDealerDeckCount] = useState<number>(4);
+    const [deck, setDeck] = useState<CardType[]>(generateDeck(dealerDeckCount));
     const [playerHand, setPlayerHand] = useState<CardType[]>([]);
     const [dealerHand, setDealerHand] = useState<CardType[]>([]);
     const [gameStarted, setGameStarted] = useState<boolean>(false);
     const [gameResult, setGameResult] = useState<string | null>(null);
     const [isPlayerTurn, setIsPlayerTurn] = useState<boolean>(false);
     const [isDealerFinished, setIsDealerFinished] = useState<boolean>(false);
-    const [dealerDeckCount, setDealerDeckCount] = useState<number>(4);
     const [playerMoney, setPlayerMoney] = useState<number>(500);
     const [currentBet, setCurrentBet] = useState<number>(0);
+    const [deckState, setDeckState] = useState(() => { // Initialize deck state outside of game start
+        let initialDeck = generateDeck(dealerDeckCount);
+        initialDeck = shuffleDeck(initialDeck);
+        return initialDeck;
+    });
 
+    const stopCardReached = useRef(false);
 
     const dealCard = (currentDeck: CardType[]): [CardType | undefined, CardType[]] => {
         if (currentDeck.length === 0) return [undefined, currentDeck]; // Handle empty deck if needed
         const card = currentDeck[0];
         const remainingDeck = currentDeck.slice(1);
+
+        if (card.rank === 'STOP' && !stopCardReached.current) {
+            stopCardReached.current = true; // Set stop card as reached
+            setGameStarted(false);
+            setGameResult("Stop Card Reached! Round Ends in a Push.");
+            handleBetOutcome('push'); // Force push when stop card is reached
+            return [card, remainingDeck]; // Still return the stop card but game will handle end
+        }
+
         return [card, remainingDeck];
     };
 
@@ -99,34 +117,34 @@ const GameScreen: React.FC = () => {
             alert("You cannot bet more money than you have.");
             return;
         }
+
+        if (deckState.length < 20) { // Check if deck is low, regenerate if needed
+            setDeckState(generateDeck(dealerDeckCount)); // Replace the deck with a new shuffled deck
+            stopCardReached.current = false; // Reset stop card flag for new deck
+        }
+
         handleResetRound();
 
-        let currentDeck = [...generateDeck()];
-        for(let i = 0; i > dealerDeckCount - 1; i++) {
-            console.log("Adding deck");
-            currentDeck.push(...generateDeck());
-        }
-        currentDeck = shuffleDeck(currentDeck);
-
+        let currentDeck = [...deckState];
         const initialPlayerHand: CardType[] = [];
         const initialDealerHand: CardType[] = [];
 
         let card, updatedDeck;
 
         [card, updatedDeck] = dealCard(currentDeck);
-        if (card) initialPlayerHand.push(card);
+        if (card && card.rank !== 'STOP') initialPlayerHand.push(card); // Only add if not stop card
         currentDeck = updatedDeck;
 
         [card, updatedDeck] = dealCard(currentDeck);
-        if (card) initialDealerHand.push(card);
+        if (card && card.rank !== 'STOP') initialDealerHand.push(card);
         currentDeck = updatedDeck;
 
         [card, updatedDeck] = dealCard(currentDeck);
-        if (card) initialPlayerHand.push(card);
+        if (card && card.rank !== 'STOP') initialPlayerHand.push(card);
         currentDeck = updatedDeck;
 
         [card, updatedDeck] = dealCard(currentDeck);
-        if (card) initialDealerHand.push(card);
+        if (card && card.rank !== 'STOP') initialDealerHand.push(card);
         currentDeck = updatedDeck;
 
         setDeck(currentDeck);
@@ -141,35 +159,36 @@ const GameScreen: React.FC = () => {
         setGameResult(null);
         setIsPlayerTurn(true);
         setIsDealerFinished(false);
+        stopCardReached.current = false;
     };
 
     const handleHit = () => {
         if (!gameStarted || !isPlayerTurn) return;
-        const [newCard, updatedDeck] = dealCard(deck);
-        if (newCard) {
+        const [newCard, updatedDeck] = dealCard(deckState); // Deal from deckState
+        if (newCard && newCard.rank !== 'STOP') {
             setPlayerHand(currentHand => [...currentHand, newCard]);
-            setDeck(updatedDeck);
+            setDeckState(updatedDeck); // Update deck state
         }
     };
 
     const handleStand = () => {
         if (!gameStarted || !isPlayerTurn) return;
         setIsPlayerTurn(false);
-        let currentDeck = [...deck];
+        let currentDeck = [...deckState]; // Use deckState
         let dealerNewHand = [...dealerHand];
 
         // Simple Dealer AI: hit until hand value is 17 or more
-        while (getHandValue(dealerNewHand) < 17) {
+        while (getHandValue(dealerNewHand) < 17 && !stopCardReached.current) { // Check stopCardReached in dealer logic
             const [newCard, updatedDeck] = dealCard(currentDeck);
-            if (newCard) {
+            if (newCard && newCard.rank !== 'STOP') {
                 dealerNewHand = [...dealerNewHand, newCard];
                 currentDeck = updatedDeck;
             } else {
-                break; // No more cards in deck
+                break; // Stop card reached in dealCard
             }
         }
         setDealerHand(dealerNewHand);
-        setDeck(currentDeck);
+        setDeckState(currentDeck); // Update deck state
         setIsDealerFinished(true);
     };
 
@@ -219,7 +238,11 @@ const GameScreen: React.FC = () => {
             return;
         }
 
-        if (!isDealerFinished) return;
+        if (!isDealerFinished && !stopCardReached.current) return; // Wait for dealer to finish or stop card
+
+        if (stopCardReached.current) {
+            return; // Game already handled when stop card was dealt
+        }
 
         const playerValue = getHandValue(playerHand);
         const dealerValue = getHandValue(dealerHand);
@@ -242,7 +265,7 @@ const GameScreen: React.FC = () => {
         setGameResult(resultMessage);
         handleBetOutcome(gameOutcome);
         setGameStarted(false);
-    }, [isDealerFinished, playerHand, gameStarted]);
+    }, [isDealerFinished, playerHand, gameStarted, stopCardReached, dealerHand]);
 
     return (
         <View style={styles.container}>
