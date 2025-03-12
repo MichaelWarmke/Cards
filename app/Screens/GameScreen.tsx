@@ -1,6 +1,6 @@
 import React, {useState, useEffect, useRef} from 'react';
 import { View, Text, Button, StyleSheet } from 'react-native';
-import Hand from '../../../mikescards/app/Components/Hand';
+import Hand from '../Components/Hand';
 
 // Define card types and deck generation function
 type Suit = 'hearts' | 'diamonds' | 'clubs' | 'spades' | 'none';
@@ -75,7 +75,6 @@ const isBlackjack = (hand: CardType[]): boolean => {
 
 const GameScreen: React.FC = () => {
     const [dealerDeckCount, setDealerDeckCount] = useState<number>(4);
-    const [deck, setDeck] = useState<CardType[]>(generateDeck(dealerDeckCount));
     const [playerHand, setPlayerHand] = useState<CardType[]>([]);
     const [dealerHand, setDealerHand] = useState<CardType[]>([]);
     const [gameStarted, setGameStarted] = useState<boolean>(false);
@@ -98,6 +97,7 @@ const GameScreen: React.FC = () => {
         const remainingDeck = currentDeck.slice(1);
 
         if (card.rank === 'STOP' && !stopCardReached.current) {
+            console.log("Stop card reached!")
             stopCardReached.current = true; // Set stop card as reached
             setGameStarted(false);
             setGameResult("Stop Card Reached! Round Ends in a Push.");
@@ -147,7 +147,12 @@ const GameScreen: React.FC = () => {
         if (card && card.rank !== 'STOP') initialDealerHand.push(card);
         currentDeck = updatedDeck;
 
-        setDeck(currentDeck);
+        if (card?.rank === 'STOP') {
+            handleResetRound()
+            return;
+        }
+
+        setDeckState(currentDeck);
         setGameStarted(true);
         setPlayerHand(initialPlayerHand);
         setDealerHand(initialDealerHand);
@@ -155,6 +160,7 @@ const GameScreen: React.FC = () => {
     };
 
     const handleResetRound = () => {
+        console.log("Resetting round")
         setGameStarted(false);
         setGameResult(null);
         setIsPlayerTurn(true);
@@ -287,7 +293,7 @@ const GameScreen: React.FC = () => {
 
             <View style={styles.handArea}>
                 <Text style={styles.handLabel}>Dealer Hand:</Text>
-                <Hand cards={dealerHand} isDealerHand={gameStarted && !isPlayerTurn} />
+                <Hand cards={dealerHand} isDealerHand={true} isDealerTurn={isPlayerTurn}/>
                 {gameStarted && !isPlayerTurn && <Text>Dealer Hand Value: {getHandValue(dealerHand)}</Text>}
             </View>
 

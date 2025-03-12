@@ -3,14 +3,14 @@
   "main": "expo-router/entry",
   "version": "1.0.0",
   "scripts": {
-    "start": "expo start",
+    "start": "npx expo start",
     "reset-project": "node ./scripts/reset-project.js",
-    "android": "expo start --android",
-    "ios": "expo start --ios",
-    "web": "expo start --web",
+    "android": "npx expo start --android",
+    "ios": "npx expo start --ios",
+    "web": "npx expo start --web",
     "test": "jest --watchAll",
-    "lint": "expo lint",
-    "webdev": "expo start --web --dev-client"
+    "lint": "npx expo lint",
+    "webdev": "npx expo start --web --dev-client"
   },
   "jest": {
     "preset": "jest-expo"

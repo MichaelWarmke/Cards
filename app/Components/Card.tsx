@@ -7,8 +7,7 @@ export interface CardProps {
     isFaceDown?: boolean; // Optional prop to represent face down cards
 }
 
-// These will be used as fallback if images are not available
-const suitSymbols = {
+const suitSymbols: Record<CardProps['suit'], string> = {
     hearts: '♥',
     diamonds: '♦',
     clubs: '♣',
@@ -16,7 +15,7 @@ const suitSymbols = {
     none: '0'
 };
 
-const suitColors = {
+const suitColors: Record<CardProps['suit'], string> = {
     hearts: 'red',
     diamonds: 'red',
     clubs: 'black',
@@ -94,12 +93,11 @@ const cardImages: CardImagesType = {
       'A': require('../../assets/images/cards/ace_of_spades.png'),
     },
     'none': {
-      'STOP': require('../../assets/images/cards/stop.png'),
+      'STOP': require('../../assets/images/cards/red_joker.png'),
     }
   };
 
   const getCardImageSource = (suit: CardProps['suit'], rank: CardProps['rank']): ImageSourcePropType | null => {
-    
     try {
         return cardImages[suit]?.[rank];
     } catch (e) {
@@ -117,7 +115,7 @@ const getCardBackImage = (): ImageSourcePropType | null => {
     }
 };
 
-export const Card: React.FC<CardProps> = ({suit, rank, isFaceDown = false}) => {
+export const Card: React.FC<CardProps> = ({suit, rank, isFaceDown = false}: CardProps) => {
     // Get the appropriate image source
     const cardImage = isFaceDown ? getCardBackImage() : getCardImageSource(suit, rank);
 

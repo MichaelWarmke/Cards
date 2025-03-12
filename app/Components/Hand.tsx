@@ -4,10 +4,11 @@ import { CardProps, Card } from './Card';
 
 interface HandProps {
     cards: { suit: CardProps['suit']; rank: CardProps['rank'] }[];
-    isDealerHand?: boolean; // Optional: to potentially handle dealer's first card face down
+    isDealerHand?: boolean;
+    isDealerTurn?: boolean; // Optional: to potentially handle dealer's first card face down
 }
 
-const Hand: React.FC<HandProps> = ({ cards, isDealerHand = false }) => {
+const Hand: React.FC<HandProps> = ({ cards, isDealerHand = false, isDealerTurn = false }) => {
     return (
         <View style={styles.handContainer}>
             {cards.map((card, index) => (
@@ -15,7 +16,7 @@ const Hand: React.FC<HandProps> = ({ cards, isDealerHand = false }) => {
                     <Card
                         suit={card.suit}
                         rank={card.rank}
-                        isFaceDown={isDealerHand && index === 0} // First card of dealer hand is face down initially
+                        isFaceDown={isDealerHand && isDealerTurn && index === 0} // First card of dealer hand is face down initially
                     />
                 </View>
             ))}
