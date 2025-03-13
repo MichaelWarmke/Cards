@@ -48,3 +48,58 @@ Join our community of developers creating universal apps.
 
 - [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
 - [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+
+# Cards - Blackjack Game
+
+A mobile card game application built with Expo and React Native.
+
+## Recent Updates
+
+### Blackjack Table Styling
+
+The game now features a realistic blackjack table design with:
+
+- Green felt background with wooden border
+- Poker chip-styled betting controls
+- Wooden action buttons with gold accents
+- Improved layout for dealer and player hands
+- Enhanced visual feedback for game status
+
+## Getting Started
+
+Follow these instructions to get the project running on your local machine.
+
+### Prerequisites
+
+- Node.js
+- npm or yarn
+- Expo CLI
+
+### Installation
+
+1. Clone the repository
+2. Install dependencies:
+   ```
+   npm install
+   ```
+   or
+   ```
+   yarn install
+   ```
+3. Start the development server:
+   ```
+   npx expo start
+   ```
+
+## Features
+
+- Play Blackjack against a dealer AI
+- Realistic card visuals
+- Betting system
+- Multiple decks with shuffle functionality
+- Stop card mechanic
+
+## Built With
+
+- [React Native](https://reactnative.dev/) - The mobile framework used
+- [Expo](https://expo.dev/) - Development platform

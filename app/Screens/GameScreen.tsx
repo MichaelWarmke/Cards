@@ -1,6 +1,9 @@
 import React, {useState, useEffect, useRef} from 'react';
-import { View, Text, Button, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, SafeAreaView } from 'react-native';
 import Hand from '../Components/Hand';
+import ChipButton from '../../components/ChipButton';
+import ActionButton from '../../components/ActionButton';
+import { TableStyles, TableColors } from '../../constants/TableStyles';
 
 // Define card types and deck generation function
 type Suit = 'hearts' | 'diamonds' | 'clubs' | 'spades' | 'none';
@@ -274,108 +277,87 @@ const GameScreen: React.FC = () => {
     }, [isDealerFinished, playerHand, gameStarted, stopCardReached, dealerHand]);
 
     return (
-        <View style={styles.container}>
-            <Text style={styles.title}>Blackjack</Text>
-
-            <View style={styles.moneyArea}>
-                <Text style={styles.moneyText}>Money: ${playerMoney}</Text>
+        <SafeAreaView style={TableStyles.tableContainer}>
+            <View style={TableStyles.titleArea}>
+                <Text style={TableStyles.title}>Blackjack</Text>
             </View>
 
-            <View style={styles.betArea}>
-                <Text style={styles.betText}>Bet: ${currentBet}</Text>
-                {!gameStarted && (
-                    <View style={styles.betButtons}>
-                        <Button title="-" onPress={decreaseBet} disabled={gameStarted || currentBet < 5} />
-                        <Button title="+" onPress={increaseBet} disabled={gameStarted || playerMoney <= currentBet} />
+            <View style={TableStyles.moneyArea}>
+                <Text style={TableStyles.moneyText}>Money: ${playerMoney}</Text>
+                <Text style={TableStyles.moneyText}>Bet: ${currentBet}</Text>
+            </View>
+
+            {!gameStarted && (
+                <View style={TableStyles.betArea}>
+                    <Text style={TableStyles.betText}>Place Your Bet</Text>
+                    <View style={{flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>
+                        <ChipButton 
+                            title="-" 
+                            onPress={decreaseBet} 
+                            disabled={gameStarted || currentBet < 5} 
+                            color={TableColors.chipBlue}
+                        />
+                        <View style={{width: 20}} />
+                        <ChipButton 
+                            title="+" 
+                            onPress={increaseBet} 
+                            disabled={gameStarted || playerMoney <= currentBet} 
+                            color={TableColors.chipRed}
+                        />
                     </View>
+                </View>
+            )}
+
+            <View style={TableStyles.dealerArea}>
+                <Text style={TableStyles.handLabel}>Dealer's Hand</Text>
+                <Hand cards={dealerHand} isDealerHand={true} isDealerTurn={isPlayerTurn}/>
+                {gameStarted && !isPlayerTurn && (
+                    <Text style={TableStyles.handValue}>Value: {getHandValue(dealerHand)}</Text>
                 )}
             </View>
 
-            <View style={styles.handArea}>
-                <Text style={styles.handLabel}>Dealer Hand:</Text>
-                <Hand cards={dealerHand} isDealerHand={true} isDealerTurn={isPlayerTurn}/>
-                {gameStarted && !isPlayerTurn && <Text>Dealer Hand Value: {getHandValue(dealerHand)}</Text>}
-            </View>
-
-            <View style={styles.handArea}>
-                <Text style={styles.handLabel}>Your Hand:</Text>
+            <View style={TableStyles.playerArea}>
+                <Text style={TableStyles.handLabel}>Your Hand</Text>
                 <Hand cards={playerHand} />
-                {gameStarted && <Text>Your Hand Value: {getHandValue(playerHand)}</Text>}
+                {gameStarted && (
+                    <Text style={TableStyles.handValue}>Value: {getHandValue(playerHand)}</Text>
+                )}
             </View>
 
-            <View style={styles.buttonsArea}>
+            <View style={TableStyles.buttonsArea}>
                 {!gameStarted ? (
-                    <Button title="Start New Game" onPress={startNewGame} disabled={currentBet <= 0 || currentBet > playerMoney} />
+                    <ActionButton 
+                        title="Deal Cards" 
+                        onPress={startNewGame} 
+                        disabled={currentBet <= 0 || currentBet > playerMoney} 
+                    />
                 ) : isPlayerTurn ? (
                     <>
-                        <Button title="Hit" onPress={handleHit} />
-                        <Button title="Stand" onPress={handleStand} />
+                        <ActionButton title="Hit" onPress={handleHit} />
+                        <ActionButton title="Stand" onPress={handleStand} />
                     </>
                 ) : (
-                    <Button title="Play Again" onPress={startNewGame} disabled={currentBet <= 0 || currentBet > playerMoney} />
+                    <ActionButton 
+                        title="Play Again" 
+                        onPress={startNewGame} 
+                        disabled={currentBet <= 0 || currentBet > playerMoney} 
+                    />
                 )}
             </View>
 
-            {gameResult && <Text style={styles.resultText}>{gameResult}</Text>}
-            {playerMoney <= 0 && gameStarted && <Text style={styles.resultText}>Game Over! You are out of money.</Text>}
-        </View>
+            {(gameResult || (playerMoney <= 0 && gameStarted)) && (
+                <View style={TableStyles.resultArea}>
+                    <Text style={TableStyles.resultText}>
+                        {playerMoney <= 0 && gameStarted 
+                            ? "Game Over! You are out of money." 
+                            : gameResult}
+                    </Text>
+                </View>
+            )}
+        </SafeAreaView>
     );
 };
 
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        padding: 20,
-        backgroundColor: '#f0f0f0',
-        alignItems: 'center',
-    },
-    title: {
-        fontSize: 28,
-        fontWeight: 'bold',
-        marginBottom: 20,
-    },
-    moneyArea: {
-        marginBottom: 10,
-    },
-    moneyText: {
-        fontSize: 18,
-        fontWeight: 'bold',
-    },
-    betArea: {
-        flexDirection: 'row',
-        justifyContent: 'center',
-        alignItems: 'center',
-        marginBottom: 20,
-    },
-    betText: {
-        fontSize: 18,
-        fontWeight: 'bold',
-        marginRight: 10,
-    },
-    betButtons: {
-        flexDirection: 'row',
-    },
-    handArea: {
-        marginBottom: 20,
-        alignItems: 'center',
-    },
-    handLabel: {
-        fontSize: 18,
-        fontWeight: 'bold',
-        marginBottom: 5,
-    },
-    buttonsArea: {
-        flexDirection: 'row',
-        justifyContent: 'space-around',
-        width: '100%',
-        marginBottom: 20,
-    },
-    resultText: {
-        fontSize: 20,
-        fontWeight: 'bold',
-        marginTop: 10,
-        textAlign: 'center',
-    },
-});
+// Using TableStyles imported from constants/TableStyles.ts
 
 export default GameScreen;
