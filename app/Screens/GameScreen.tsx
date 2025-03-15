@@ -1,9 +1,9 @@
-import React, {useState, useEffect, useRef} from 'react';
-import { View, Text, StyleSheet, SafeAreaView } from 'react-native';
+import React, {useEffect, useRef, useState} from 'react';
+import {SafeAreaView, Text, View} from 'react-native';
 import Hand from '../Components/Hand';
 import ChipButton from '../../components/ChipButton';
 import ActionButton from '../../components/ActionButton';
-import { TableStyles, TableColors } from '../../constants/TableStyles';
+import {TableColors, TableStyles} from '../../constants/TableStyles';
 
 // Define card types and deck generation function
 type Suit = 'hearts' | 'diamonds' | 'clubs' | 'spades' | 'none';
@@ -87,9 +87,7 @@ const GameScreen: React.FC = () => {
     const [playerMoney, setPlayerMoney] = useState<number>(500);
     const [currentBet, setCurrentBet] = useState<number>(0);
     const [deckState, setDeckState] = useState(() => { // Initialize deck state outside of game start
-        let initialDeck = generateDeck(dealerDeckCount);
-        initialDeck = shuffleDeck(initialDeck);
-        return initialDeck;
+        return generateDeck(dealerDeckCount);
     });
 
     const stopCardReached = useRef(false);
@@ -243,6 +241,7 @@ const GameScreen: React.FC = () => {
         if (isBlackjack(dealerHand)) {
             setGameResult("Dealer Blackjack! Dealer Wins.");
             handleBetOutcome('dealer'); // Player loses bet when dealer has blackjack
+            setIsPlayerTurn(false); // Set isPlayerTurn to false to show both dealer cards
             setGameStarted(false);
             return;
         }
