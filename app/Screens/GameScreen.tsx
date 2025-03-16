@@ -19,12 +19,12 @@ const generateDeck = (deckCount: number, includeStopCard: boolean = true): CardT
     for (let i = 0; i < 4; i++) { // 4 decks by default as per standard blackjack
         suits.forEach(suit => {
             ranks.forEach(rank => {
-                deck.push({ suit, rank });
+                deck.push({suit, rank});
             });
         });
     }
     if (includeStopCard) {
-        deck.push({ suit: 'none', rank: 'STOP' }); // Add stop card to the generated deck
+        deck.push({suit: 'none', rank: 'STOP'}); // Add stop card to the generated deck
     }
     return shuffleDeck(deck);
 };
@@ -281,65 +281,53 @@ const GameScreen: React.FC = () => {
                 <Text style={TableStyles.title}>Blackjack</Text>
             </View>
 
-            <View style={TableStyles.moneyArea}>
-                <Text style={TableStyles.moneyText}>Money: ${playerMoney}</Text>
-                <Text style={TableStyles.moneyText}>Bet: ${currentBet}</Text>
+            <View style={TableStyles.dealerArea}>
+                <Hand cards={dealerHand} isDealerHand={true} isDealerTurn={isPlayerTurn}/>
+            </View>
+
+            <View style={TableStyles.playerArea}>
+                <Hand cards={playerHand}/>
             </View>
 
             {!gameStarted && (
                 <View style={TableStyles.betArea}>
-                    <Text style={TableStyles.betText}>Place Your Bet</Text>
+                    <Text style={TableStyles.moneyText}>${playerMoney}</Text>
                     <View style={{flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>
-                        <ChipButton 
-                            title="-" 
-                            onPress={decreaseBet} 
-                            disabled={gameStarted || currentBet < 5} 
+                        <ChipButton
+                            title="-"
+                            onPress={decreaseBet}
+                            disabled={gameStarted || currentBet < 5}
                             color={TableColors.chipBlue}
                         />
-                        <View style={{width: 20}} />
-                        <ChipButton 
-                            title="+" 
-                            onPress={increaseBet} 
-                            disabled={gameStarted || playerMoney <= currentBet} 
+                        <View style={{width: 20}}/>
+                        <ChipButton
+                            title="+"
+                            onPress={increaseBet}
+                            disabled={gameStarted || playerMoney <= currentBet}
                             color={TableColors.chipRed}
                         />
                     </View>
+                    <Text style={TableStyles.moneyText}>${currentBet}</Text>
                 </View>
             )}
 
-            <View style={TableStyles.dealerArea}>
-                <Text style={TableStyles.handLabel}>Dealer's Hand</Text>
-                <Hand cards={dealerHand} isDealerHand={true} isDealerTurn={isPlayerTurn}/>
-                {gameStarted && !isPlayerTurn && (
-                    <Text style={TableStyles.handValue}>Value: {getHandValue(dealerHand)}</Text>
-                )}
-            </View>
-
-            <View style={TableStyles.playerArea}>
-                <Text style={TableStyles.handLabel}>Your Hand</Text>
-                <Hand cards={playerHand} />
-                {gameStarted && (
-                    <Text style={TableStyles.handValue}>Value: {getHandValue(playerHand)}</Text>
-                )}
-            </View>
-
             <View style={TableStyles.buttonsArea}>
                 {!gameStarted ? (
-                    <ActionButton 
-                        title="Deal Cards" 
-                        onPress={startNewGame} 
-                        disabled={currentBet <= 0 || currentBet > playerMoney} 
+                    <ActionButton
+                        title="Deal Cards"
+                        onPress={startNewGame}
+                        disabled={currentBet <= 0 || currentBet > playerMoney}
                     />
                 ) : isPlayerTurn ? (
                     <>
-                        <ActionButton title="Hit" onPress={handleHit} />
-                        <ActionButton title="Stand" onPress={handleStand} />
+                        <ActionButton title="Hit" onPress={handleHit}/>
+                        <ActionButton title="Stand" onPress={handleStand}/>
                     </>
                 ) : (
-                    <ActionButton 
-                        title="Play Again" 
-                        onPress={startNewGame} 
-                        disabled={currentBet <= 0 || currentBet > playerMoney} 
+                    <ActionButton
+                        title="Play Again"
+                        onPress={startNewGame}
+                        disabled={currentBet <= 0 || currentBet > playerMoney}
                     />
                 )}
             </View>
@@ -347,8 +335,8 @@ const GameScreen: React.FC = () => {
             {(gameResult || (playerMoney <= 0 && gameStarted)) && (
                 <View style={TableStyles.resultArea}>
                     <Text style={TableStyles.resultText}>
-                        {playerMoney <= 0 && gameStarted 
-                            ? "Game Over! You are out of money." 
+                        {playerMoney <= 0 && gameStarted
+                            ? "Game Over! You are out of money."
                             : gameResult}
                     </Text>
                 </View>

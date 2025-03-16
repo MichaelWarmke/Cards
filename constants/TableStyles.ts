@@ -19,12 +19,16 @@ export const TableStyles = StyleSheet.create({
   // Main container with felt background
   tableContainer: {
     flex: 1,
+    flexDirection: 'column',
+    alignItems: 'center',
     backgroundColor: TableColors.feltGreen,
     padding: 20,
     borderWidth: 10,
     borderColor: TableColors.woodBrown,
+    justifyContent: 'flex-start',
+    gap: 30,
   },
-  
+
   // Title area with decorative elements
   titleArea: {
     alignItems: 'center',
@@ -33,7 +37,7 @@ export const TableStyles = StyleSheet.create({
     borderBottomWidth: 2,
     borderBottomColor: TableColors.goldAccent,
   },
-  
+
   title: {
     fontSize: 32,
     fontWeight: 'bold',
@@ -42,7 +46,7 @@ export const TableStyles = StyleSheet.create({
     textShadowOffset: { width: 1, height: 1 },
     textShadowRadius: 2,
   },
-  
+
   // Money display area
   moneyArea: {
     flexDirection: 'row',
@@ -54,15 +58,16 @@ export const TableStyles = StyleSheet.create({
     backgroundColor: TableColors.feltGreenDark,
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: TableColors.goldAccent,
+    borderColor: TableColors.white,
   },
-  
+
   moneyText: {
     fontSize: 18,
     fontWeight: 'bold',
     color: TableColors.white,
+    paddingHorizontal: 10,
   },
-  
+
   // Betting area with chip-like styling
   betArea: {
     flexDirection: 'row',
@@ -74,22 +79,22 @@ export const TableStyles = StyleSheet.create({
     backgroundColor: TableColors.feltGreenLight,
     borderRadius: 25,
     borderWidth: 2,
-    borderColor: TableColors.goldAccent,
+    borderColor: TableColors.white,
   },
-  
+
   betText: {
     fontSize: 18,
     fontWeight: 'bold',
     color: TableColors.white,
     marginRight: 15,
   },
-  
+
   betButtons: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     width: 100,
   },
-  
+
   betButton: {
     width: 40,
     height: 40,
@@ -100,25 +105,41 @@ export const TableStyles = StyleSheet.create({
     borderWidth: 2,
     borderColor: TableColors.white,
   },
-  
+
   betButtonText: {
     fontSize: 24,
     fontWeight: 'bold',
     color: TableColors.white,
   },
-  
+
   // Hand areas with decorative borders
   dealerArea: {
     marginBottom: 20,
     padding: 15,
     borderRadius: 10,
     backgroundColor: TableColors.feltGreenLight,
-    borderWidth: 1,
-    borderColor: TableColors.goldAccent,
     alignItems: 'center',
+    width: 350,
+    height: 170,
+    justifyContent: 'center',
+    flexShrink: 0,
   },
-  
+
   playerArea: {
+    marginBottom: 20,
+    padding: 15,
+    borderRadius: 10,
+    backgroundColor: TableColors.feltGreenLight,
+    alignItems: 'center',
+    width: 350,
+    height: 170,
+    justifyContent: 'center',
+    flexShrink: 0,
+    overflow: 'visible',
+  },
+
+  // Base style for player areas in multi-player layout
+  playerAreaBase: {
     marginBottom: 20,
     padding: 15,
     borderRadius: 10,
@@ -126,29 +147,39 @@ export const TableStyles = StyleSheet.create({
     borderWidth: 1,
     borderColor: TableColors.goldAccent,
     alignItems: 'center',
+    width: 200,
+    height: 170,
+    justifyContent: 'center',
   },
-  
+
+  // Base style for action buttons in multi-player layout
+  actionButtonsBase: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    marginBottom: 20,
+  },
+
   handLabel: {
     fontSize: 18,
     fontWeight: 'bold',
     color: TableColors.white,
     marginBottom: 10,
   },
-  
+
   handValue: {
     fontSize: 16,
     color: TableColors.white,
     marginTop: 5,
   },
-  
+
   // Game control buttons
   buttonsArea: {
     flexDirection: 'row',
-    justifyContent: 'space-around',
+    justifyContent: 'center',
     width: '100%',
     marginBottom: 20,
   },
-  
+
   actionButton: {
     paddingHorizontal: 20,
     paddingVertical: 10,
@@ -157,13 +188,13 @@ export const TableStyles = StyleSheet.create({
     borderWidth: 2,
     borderColor: TableColors.goldAccent,
   },
-  
+
   actionButtonText: {
     fontSize: 16,
     fontWeight: 'bold',
     color: TableColors.white,
   },
-  
+
   // Game result display
   resultArea: {
     padding: 10,
@@ -171,7 +202,7 @@ export const TableStyles = StyleSheet.create({
     backgroundColor: 'rgba(0, 0, 0, 0.7)',
     alignItems: 'center',
   },
-  
+
   resultText: {
     fontSize: 20,
     fontWeight: 'bold',
